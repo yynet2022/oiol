@@ -1,0 +1,147 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+{% comment %}
+<div class="row p-3 border border-primary">
+{% with with_workstatus=True %}
+{% endwith %}
+  abc
+</div>
+{% endcomment %}
+
+<div class="row">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="lead col-12 text-center">
+      {% now "Y年n月j日(D) G時i分" %}<br />
+      ようこそ<br />
+      {% if user.is_authenticated %}
+      {{ user.get_full_name }} さん
+      {% else %}
+      オフィス出退記録へ
+      {% endif %}
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="m-2 d-flex justify-content-center">
+	{% if user.action.isOut %}
+	<a href="{% url 'main:in' %}" class="col-8 btn btn-primary">
+	  出社にする</a>
+	{% else %}
+	<a href="{% url 'main:out' %}" class="col-8 btn btn-primary">
+	  退出にする</a>
+	{% endif %}
+    </div>
+    <div class="d-flex justify-content-end">
+      <a href="{% url 'main:log' %}" class="m-2">履歴</a>
+      <a href="{% url 'account:login' %}" class="m-2">ユーザ切り替え</a>
+      <a href="{% url 'account:logout' %}" class="m-2">ログアウト</a>
+    </div>
+    {% else %}
+    <div class="d-flex justify-content-center">
+      <a href="{% url 'account:login' %}" class="col-8 btn btn-primary">
+	ログイン</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row my-4">
+  <div class="col-12 col-md-8 col-lg-6">
+    <form method="post">{% csrf_token %}
+      <table class="table table-sm">
+	<thead>
+	  <tr>
+	    <th scope="col" class="px-2 col-auto">
+	      {% if user.is_authenticated %}
+	      <input type="checkbox" name="listall" class="form-check-input"
+		     id="id_cb_list_all">
+	      {% endif %}
+	    </th>
+	    <td scope="col" class="px-2 col-8 text-nowrap">出社中の人たち</td>
+	    <td scope="col" class="px-2 col-auto text-nowrap">出社日時</td>
+	  </tr>
+	</thead>
+	<tbody>
+	  {% for q in qlist %}
+	  <tr>
+	    <th scope="row" class="px-2">
+	      <input type="checkbox" class="form-check-input"
+		     name="cb_{{q.user.uid}}"
+		     id="id_cb_list_{{forloop.counter0}}">
+	    </th>
+	    <td scope="row" class="px-2 text-nowrap">
+	      <label for="id_cb_list_{{forloop.counter0}}">
+		{{q.user.get_full_name}}</label></td>
+	    <td scope="row" class="px-2 text-nowrap">
+	      {{q.update_at|date:"n/j G:i"}}</td>
+	  </tr>
+	  {% empty %}
+	  <tr><th></th><td class="row">(いません)</td><td></td></tr>
+	  {% endfor %}
+	</tbody>
+      </table>
+      <div class="d-flex justify-content-end">
+	{% if user.is_authenticated %}
+	<button type="submit" class="btn btn-primary text-nowrap"
+		id="id_form_submit" name="form_submit" value="out">
+	  まとめて退出にする</button>
+	{% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+  (function($){
+      // console.log("Hello, world")
+      const num_of_list = (function () {
+	  const max = 10000
+	  for (let i = 0; i < max; i ++) {
+	      if (! $("#id_cb_list_" + i).length) {
+		  return i
+	      }
+	  }
+	  return max; })();
+      // console.log (num_of_list);
+
+      function setup_cb () {
+	  let n = 0
+	  for (let i = 0; i < num_of_list; i ++) {
+	      if ($("#id_cb_list_" + i).prop('checked')) {
+		  n ++
+	      }
+	  }
+	  // console.log (n)
+	  let w0 = $("#id_cb_list_all")
+	  let w1 = $("#id_form_submit")
+	  if (n == 0) {
+	      w0.prop('checked', false)
+	      w0.prop('indeterminate', false)
+	      w1.prop('disabled', true)
+	  } else if (n == num_of_list) {
+	      w0.prop('checked', true)
+	      w0.prop('indeterminate', false)
+	      w1.prop('disabled', false)
+	  } else {
+	      w0.prop('checked', false)
+	      w0.prop('indeterminate', true)
+	      w1.prop('disabled', false)
+	  }
+      }
+
+      setup_cb ()
+      for (let i = 0; i < num_of_list; i ++) {
+	  $("#id_cb_list_" + i).change (setup_cb)
+      }
+      $("#id_cb_list_all").change (function(e){
+	  const t = $(this).prop('checked')
+	  for (let i = 0; i < num_of_list; i ++) {
+	      $("#id_cb_list_" + i).prop('checked', t)
+	  }
+	  $("#id_form_submit").prop('disabled', !t)
+      });
+  })(jQuery);
+</script>
+{% endblock %}
