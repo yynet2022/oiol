@@ -14,7 +14,7 @@ for i; do
 	    $0 clean
 	    rm -f db.sqlite3 
 	    find . -type d -name __pycache__ -print | xargs rm -rf
-	    find . -type f -empty -name __init__.py -print | xargs rm -f
+	    # find . -type f -empty -name __init__.py -print | xargs rm -f
 	    rm -f */migrations/0*.py
 	    ;;
 	migrate)
