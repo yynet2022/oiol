@@ -37,13 +37,16 @@ class User(AbstractUser):
         max_length=10,
         unique=True,
     )
+    division = models.CharField(
+        verbose_name='Division',
+        max_length=50,
+        unique=False,
+    )
     objects = MyUserManager()
 
     def get_full_name(self):
-        return self.username
-
-    def get_short_name(self):
-        return self.uid
+        full_name = "%s %s" % (self.division, super().get_full_name())
+        return full_name.strip()
 
     def __str__(self):
         return 'User<{},{}>'.format(self.uid, self.is_superuser)

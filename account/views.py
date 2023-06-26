@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib import messages
 from . import apps, forms
 
 
@@ -26,9 +27,13 @@ class LoginView(generic.FormView):
 
         user = self.request.user
         if not user.is_authenticated or uid != user.uid:
-            user = authenticate(uid=uid)
-            if user is not None:
+            try:
+                user = authenticate(uid=uid)
                 login(self.request, user)
+                messages.success(self.request, "ログインしました")
+            except Exception as e:
+                messages.warning(self.request,
+                                 "ログインに失敗しました: " + str(e))
         return r
 
 

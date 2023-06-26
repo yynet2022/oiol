@@ -11,6 +11,18 @@
 
 <div class="row">
   <div class="col-12 col-md-8 col-lg-6">
+    <ul>
+      {% for m in messages %}
+      <li><div {% if m.tags %}class="{{ m.tags }} m-2"{% endif %}>
+	  {{m}}
+	</div></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-md-8 col-lg-6">
     <div class="lead col-12 text-center">
       {% now "Y年n月j日(D) G時i分" %}<br />
       ようこそ<br />
