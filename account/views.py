@@ -32,8 +32,10 @@ class LoginView(generic.FormView):
                 login(self.request, user)
                 messages.success(self.request, "ログインしました")
             except Exception as e:
-                messages.warning(self.request,
-                                 "ログインに失敗しました: " + str(e))
+                form.add_error('uid', "ログインに失敗しました: " + str(e))
+                context = self.get_context_data(form=form)
+                context["form"].initial = {'uid': uid}
+                return self.render_to_response(context)
         return r
 
 

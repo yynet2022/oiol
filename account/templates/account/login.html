@@ -1,24 +1,17 @@
 {% extends 'account/base.html' %}
-
-{% block menubar %}
-{% with with_workstatus=True %}
-{% endwith %}
-{% endblock %}
-
 {% block content %}
-{% comment %}
-<div class="row p-3 border border-primary">
-  abc
+<div class="row">
+  {% if user.is_authenticated %}
+  （現在 {{user.username}} でログイン中です。）
+  {% endif %}
 </div>
-{% endcomment %}
-{% if user.is_authenticated %}
-現在 {{user.username}} でログイン中です。
-<a href="{% url 'main:top' %}">戻る</A>
-{% endif %}
 
-<form method="post">
-{% csrf_token %}
-{{ form }}
-<input type="submit" value="submit" />
-</form>
+<div class="row">
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="ログイン" class="btn btn-primary"/>
+    <a href="{% url 'main:top' %}" class="btn btn-primary">戻る</A>
+  </form>
+</div>
 {% endblock %}
