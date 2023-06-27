@@ -58,6 +58,35 @@
 </div>
 
 <div class="row my-4">
+  {% if False %}
+  <nav class="navbar navbar-expand-xxl navbar-light bg-light">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	<span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+	<form class="d-flex">
+	  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+	      <input type="checkbox" class="form-check-input"
+		     name="cb_n_0" id="id_cb_n_0" checked>
+	      <label for="id_cb_n_0">000</label>
+            </li>
+            <li class="nav-item">
+	      <input type="checkbox" class="form-check-input"
+		     name="cb_n_1" id="id_cb_n_1" checked>
+	      <label for="id_cb_n_1">111</label>
+            </li>
+            <li class="nav-item">
+              <button class="btn btn-primary" type="submit">更新</button>
+	    </li>
+	  </ul>
+	</form>
+      </div>
+    </div>
+  </nav>
+  {% endif %}
+
   <div class="col-12 col-md-8 col-lg-6">
     <form method="post">{% csrf_token %}
       <table class="table table-sm">
