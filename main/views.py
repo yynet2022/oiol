@@ -52,7 +52,7 @@ class TopView(generic.FormView):
             action.save()
 
         context['qlist'] = Action.objects.filter(action=models.ACTION_IN).\
-            order_by('user__username')
+            order_by('user__division', 'user__first_name', 'user__last_name')
         """
         print(Action.objects.filter(action=models.ACTION_IN).\
               order_by('user__username').query)

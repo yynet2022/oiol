@@ -12,11 +12,11 @@ class MyUserManager(BaseUserManager):
             raise ValueError('Users must have an UID')
         user = self.model(uid=uid.lower())
         user.username = uid.upper()  # char150, Unique=True
-        # first_name = char150, blank=True
-        # last_name = char150, blank=True
-        # email = blank=True
-        user.is_staff = True
-        user.is_active = True
+        user.first_name = kwargs.get('first_name', '')
+        user.last_name = kwargs.get('last_name', '')
+        user.email = kwargs.get('email', '')
+        user.is_staff = kwargs.get('is_staff', True)
+        user.is_active = kwargs.get('is_active', True)
         user.is_superuser = False
 
         user.set_password(None)
@@ -44,9 +44,10 @@ class User(AbstractUser):
     )
     objects = MyUserManager()
 
-    def get_full_name(self):
+    def get_division_full_name(self):
         full_name = "%s %s" % (self.division, super().get_full_name())
         return full_name.strip()
 
     def __str__(self):
-        return 'User<{},{}>'.format(self.uid, self.is_superuser)
+        return 'User<{},{},{},{}>'.format(
+            self.uid, self.division, self.get_full_name(), self.is_superuser)

@@ -27,7 +27,7 @@
       {% now "Y年n月j日(D) G時i分" %}<br />
       ようこそ<br />
       {% if user.is_authenticated %}
-      {{ user.get_full_name }} さん
+      {{ user.division }} {{ user.get_full_name }} さん
       {% else %}
       オフィス出退記録へ
       {% endif %}
@@ -83,7 +83,7 @@
 	    </th>
 	    <td scope="row" class="px-2 text-nowrap">
 	      <label for="id_cb_list_{{forloop.counter0}}">
-		{{q.user.get_full_name}}</label></td>
+		{{q.user.division}} {{q.user.get_full_name}}</label></td>
 	    <td scope="row" class="px-2 text-nowrap">
 	      {{q.update_at|date:"n/j G:i"}}</td>
 	  </tr>
