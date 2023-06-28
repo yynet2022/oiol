@@ -10,7 +10,7 @@ Action = models.Action
 
 
 @receiver(post_save, sender=User)
-def create_user_post_save(sender, user, created, **kwargs):
+def create_user_post_save(sender, instance, created, **kwargs):
     if created:
-        action = getattr(user, 'action', None) or Action(user=user)
+        action = getattr(instance, 'action', None) or Action(user=instance)
         action.save()

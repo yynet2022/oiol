@@ -35,7 +35,7 @@ class TopView(generic.FormView):
         r = super().form_valid(form)
         for x in form.changed_data:
             if x.startswith('cb_'):
-                user = User.objects.get(uid=x.lstrip('cb_'))
+                user = User.objects.get(uid=x[3:])
                 user.action.setOut()
                 user.action.update_at = timezone.now()
                 user.action.save()
