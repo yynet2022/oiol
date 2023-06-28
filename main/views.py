@@ -36,21 +36,15 @@ class TopView(generic.FormView):
         for x in form.changed_data:
             if x.startswith('cb_'):
                 user = User.objects.get(uid=x.lstrip('cb_'))
-                action = getattr(user, 'action', None) or Action(user=user)
-                action.setOut()
-                action.update_at = timezone.now()
-                action.save()
+                user.action.setOut()
+                user.action.update_at = timezone.now()
+                user.action.save()
                 Log(user=user,
-                    message=action.get_action_display()+'*').save()
+                    message=user.action.get_action_display()+'*').save()
         return r
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            user = self.request.user
-            action = getattr(user, 'action', None) or Action(user=user)
-            action.save()
-
         context['qlist'] = Action.objects.filter(action=models.ACTION_IN).\
             order_by('user__division', 'user__first_name', 'user__last_name')
         """
@@ -64,7 +58,7 @@ def ToggleView(request, *args, **kwargs):
     v = kwargs.get('action', None)
     if request.user.is_authenticated:
         user = request.user
-        action = getattr(user, 'action', None) or Action(user=user)
+        action = user.action
         if v == models.ACTION_IN:
             action.setIn()
         elif v == models.ACTION_OUT:
