@@ -11,7 +11,7 @@ class MyUserManager(BaseUserManager):
         if not uid:
             raise ValueError('Users must have an UID')
         user = self.model(uid=uid.lower())
-        user.username = uid.upper()  # char150, Unique=True
+        user.username = uid.upper()  # Unique=True
         user.first_name = kwargs.get('first_name', '')
         user.last_name = kwargs.get('last_name', '')
         user.email = kwargs.get('email', '')
@@ -19,7 +19,7 @@ class MyUserManager(BaseUserManager):
         user.is_active = kwargs.get('is_active', True)
         user.is_superuser = False
 
-        user.set_password(None)
+        user.set_password(kwargs.get('password', None))
         user.save(using=self._db)
         return user
 

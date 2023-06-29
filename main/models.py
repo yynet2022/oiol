@@ -28,18 +28,32 @@ class Action(models.Model):
     def isIn(self):
         return self.action == ACTION_IN
 
-    def setOut(self):
-        self.action = ACTION_OUT
+    def _setAction(self, v):
+        self.action = v
+
+    def setOut(self, bo = False):
+        self._setAction(ACTION_OUT)
+        self._bo = bo
 
     def setIn(self):
-        self.action = ACTION_IN
+        self._setAction(ACTION_IN)
+
+    def getStat(self):
+        s = self.get_action_display()
+        if self._bo:
+            s += "*"
+        return s
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._bo = False
 
     def __str__(self):
         try:
             s = "<Action:%s," % self.user.get_full_name()
         except Exception:
             s = "<Action:-,"
-        s += self.get_action_display() + ","
+        s += self.getStat() + ","
         s += str(timezone.localtime(self.update_at)) + ">"
         return s
 

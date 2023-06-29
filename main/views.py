@@ -11,7 +11,6 @@ from . import apps, models
 
 User = get_user_model()
 Action = models.Action
-Log = models.Log
 
 
 class TopView(generic.FormView):
@@ -36,11 +35,9 @@ class TopView(generic.FormView):
         for x in form.changed_data:
             if x.startswith('cb_'):
                 user = User.objects.get(uid=x[3:])
-                user.action.setOut()
+                user.action.setOut(bo=True)
                 user.action.update_at = timezone.now()
                 user.action.save()
-                Log(user=user,
-                    message=user.action.get_action_display()+'*').save()
         return r
 
     def get_context_data(self, **kwargs):
@@ -59,13 +56,9 @@ def ToggleView(request, *args, **kwargs):
     if request.user.is_authenticated:
         user = request.user
         action = user.action
-        if v == models.ACTION_IN:
-            action.setIn()
-        elif v == models.ACTION_OUT:
-            action.setOut()
+        action._setAction(v)
         action.update_at = timezone.now()
         action.save()
-        Log(user=user, message=action.get_action_display()).save()
     return redirect('main:top')
 
 
@@ -86,8 +79,8 @@ class LogView(generic.ListView):
     paginator_class = _Paginator
 
     def get_queryset(self):
-        q = Log.objects.none()
+        q = models.Log.objects.none()
         if self.request.user.is_authenticated:
-            q = Log.objects.filter(user=self.request.user).\
+            q = models.Log.objects.filter(user=self.request.user).\
                 order_by('create_at').reverse()
         return q
