@@ -28,25 +28,25 @@ class Action(models.Model):
     def isIn(self):
         return self.action == ACTION_IN
 
-    def _setAction(self, v):
+    def _setAction(self, v, by_myself=True):
         self.action = v
+        self._by_myself = by_myself
 
-    def setOut(self, bo = False):
-        self._setAction(ACTION_OUT)
-        self._bo = bo
+    def setOut(self, by_myself=True):
+        self._setAction(ACTION_OUT, by_myself)
 
-    def setIn(self):
-        self._setAction(ACTION_IN)
+    def setIn(self, by_myself=True):
+        self._setAction(ACTION_IN, by_myself)
 
     def getStat(self):
         s = self.get_action_display()
-        if self._bo:
+        if not self._by_myself:
             s += "*"
         return s
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._bo = False
+        self._by_myself = True
 
     def __str__(self):
         try:
