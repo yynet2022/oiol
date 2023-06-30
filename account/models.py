@@ -12,6 +12,7 @@ class MyUserManager(BaseUserManager):
             raise ValueError('Users must have an UID')
         user = self.model(uid=uid.lower())
         user.username = uid.upper()  # Unique=True
+        user.division = kwargs.get('division', '')
         user.first_name = kwargs.get('first_name', '')
         user.last_name = kwargs.get('last_name', '')
         user.email = kwargs.get('email', '')
@@ -24,7 +25,7 @@ class MyUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, uid, **kwargs):
-        user = self.create_user(uid)
+        user = self.create_user(uid, **kwargs)
         user.is_superuser = True
         user.save(using=self._db)
         return user
