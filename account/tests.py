@@ -1,6 +1,7 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.contrib.auth import authenticate, get_user_model
 from django.db.utils import IntegrityError
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -65,3 +66,31 @@ class A(TestCase):
             u1 = User.objects.create_superuser(uid=uid)
             self.assertIsInstance(u1, User)
         self.assertIsInstance(e.exception, IntegrityError)
+
+
+class B(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_A(self):
+        r = self.client.get(reverse('account:login'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'autofocus')
+        self.assertContains(r, 'required')
+        self.assertIn('form', r.context)
+        # print(r.content)
+
+    def test_login(self):
+        r = self.client.post(reverse('account:login'), {'uid': 'a001001'})
+        self.assertRedirects(r, reverse('main:top'))
+
+    def test_login_error(self):
+        r = self.client.post(reverse('account:login'), {'uid': 'a001011'})
+        self.assertIsNotNone(r.context)
+        self.assertIn('form', r.context)
+        e = r.context['form'].errors.get('uid', '')
+        self.assertTrue(e)
+
+    def test_logout(self):
+        r = self.client.get(reverse('account:logout'))
+        self.assertRedirects(r, reverse('main:top'))
