@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.test import TestCase, Client
 from django.contrib.auth import authenticate, get_user_model
 from django.db.utils import IntegrityError
@@ -90,6 +91,8 @@ class B(TestCase):
         self.assertIn('form', r.context)
         e = r.context['form'].errors.get('uid', '')
         self.assertTrue(e)
+        for x in list(e):
+            self.assertIn('No such user:', x)
 
     def test_logout(self):
         r = self.client.get(reverse('account:logout'))
