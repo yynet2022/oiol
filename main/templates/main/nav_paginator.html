@@ -1,48 +1,30 @@
 <nav aria-label="Page navigation">
   <ul class="pagination">
-    {% with obj=page_obj paginator=page_obj.paginator %}
+    {% with obj=page_obj %}
 
-    {% if obj.has_previous %}
+    {% with tg=obj.has_previous|yesno:'a,span,span' %}
     <li class="page-item">
-      <a class="page-link" href="{% url nav_url_name 1 %}">
-	最初&lt;&lt;</a></li>
-    <li class="page-item">
-      <a class="page-link"
-	 href="{% url nav_url_name obj.previous_page_number %}">
-	戻る&lt;</a></li>
-    {% else %}
-    <li class="page-item disabled">
-      <span class="page-link">最初&lt;&lt;</span></li>
-    <li class="page-item disabled">
-      <span class="page-link">戻る&lt;</span></li>
-    {% endif %}
+      <{{tg}} class="page-link"
+	      href="{% url nav_url_name obj.previous_page_number %}">
+	戻る&lt;</{{tg}}></li>
+    {% endwith %}
 
     {% for i in page_nav_list %}
-    {% if obj.number == i %}
-    <li class="page-item active">
-      <span class="page-link">{{ i }}</span></li>
-    {% elif paginator.ELLIPSIS == i %}
-    <li class="page-item">
-      <span class="page-link">{{ i }}</span></li>
-    {% else %}
-    <li class="page-item">
-      <a class="page-link" href="{% url nav_url_name i %}">{{ i }}</a></li>
-    {% endif %}
+    <li class="page-item {% if obj.number == i %}active{% endif %}">
+      {% if obj.number == i or paginator.ELLIPSIS == i %}
+      <span class="page-link">{{ i }}</span>
+      {% else %}
+      <a class="page-link" href="{% url nav_url_name i %}">{{ i }}</a>
+      {% endif %}
+    </li>
     {% endfor %}
 
-    {% if obj.has_next %}
+    {% with tg=obj.has_next|yesno:'a,span,span' %}
     <li class="page-item">
-      <a class="page-link" href="{% url nav_url_name obj.next_page_number %}">
-	&gt;次へ</a></li>
-    <li class="page-item">
-      <a class="page-link" href="{% url nav_url_name paginator.num_pages %}">
-	&gt;&gt;最後</a></li>
-    {% else %}
-    <li class="page-item disabled">
-      <span class="page-link">&gt;次へ</span></li>
-    <li class="page-item disabled">
-      <span class="page-link">&gt;&gt;最後</span></li>
-    {% endif %}
+      <{{tg}} class="page-link"
+	      href="{% url nav_url_name obj.next_page_number %}">
+	&gt;次へ</{{tg}}></li>
+    {% endwith %}
 
     {% endwith %}
   </ul>
