@@ -42,12 +42,10 @@ class TopView(generic.FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['qlist'] = Action.objects.filter(action=models.ACTION_IN).\
+        qlist = Action.objects.filter(action=models.ACTION_IN).\
             order_by('user__division', 'user__first_name', 'user__last_name')
-        """
-        print(Action.objects.filter(action=models.ACTION_IN).\
-              order_by('user__username').query)
-        """
+        # print(qlist.query)
+        context.update({'qlist': qlist})
         return context
 
 
