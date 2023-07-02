@@ -84,3 +84,14 @@ class LogView(generic.ListView):
             q = models.Log.objects.filter(user=self.request.user).\
                 order_by('create_at').reverse()
         return q
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if context["is_paginated"]:
+            p = context["page_obj"]
+            r = p.paginator.get_elided_page_range(
+                number=p.number, on_each_side=2, on_ends=2)
+            context.update({"page_nav_list": r})
+        else:
+            context.update({"page_nav_list": None})
+        return context
