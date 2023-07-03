@@ -21,6 +21,9 @@ for i; do
 	    python manage.py makemigrations --no-color 
 	    python manage.py migrate --no-color
 	    ;;
+	test)
+	    python manage.py test account main
+	    ;;
 	generate_secretkey)
 	    python manage.py generate_secretkey --no-color 
 	    ;;

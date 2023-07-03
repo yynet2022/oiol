@@ -42,7 +42,7 @@ def main():
                 division=divisions[kd],
                 first_name=first_names[kf],
                 last_name=last_names[kl],
-                email=f'a{ki:06d}0'+'@yynet.org',
+                email=f'a{ki:06d}0'+'@example.jp',
                 is_staff=True,
                 is_active=True,
                 password='pswd'+f'a{ki:06d}0',
