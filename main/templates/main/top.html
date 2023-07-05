@@ -88,6 +88,11 @@
   {% endif %}
 
   <div class="col-12 col-md-8 col-lg-6">
+    {% if is_paginated %}
+    {% include "main/nav_paginator.html" with nav_url_name="main:top" %}
+    <div class="w-100"></div>
+    {% endif %}
+
     <form method="post">{% csrf_token %}
       <table class="table table-sm">
 	<thead>
@@ -103,7 +108,7 @@
 	  </tr>
 	</thead>
 	<tbody>
-	  {% for q in qlist %}
+	  {% for q in object_list %}
 	  <tr>
 	    <th scope="row" class="px-2">
 	      <input type="checkbox" class="form-check-input"

@@ -2,7 +2,7 @@
 from django.shortcuts import redirect
 from django.views import generic
 from django.utils import timezone
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django import forms
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -13,12 +13,44 @@ User = get_user_model()
 Action = models.Action
 
 
-class TopView(generic.FormView):
+class _Paginator(Paginator):
+    def validate_number(self, number):
+        try:
+            n = super().validate_number(number)
+        except PageNotAnInteger:
+            n = 1
+        except EmptyPage:
+            n = self.num_pages
+        return n
+
+
+class _PageRangeMixin(generic.list.MultipleObjectMixin):
+    paginator_class = _Paginator
+    paginate_by = 5
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if context["is_paginated"]:
+            p = context["page_obj"]
+            r = p.paginator.get_elided_page_range(
+                number=p.number, on_each_side=1, on_ends=1)
+            context.update({"page_nav_list": r})
+        else:
+            context.update({"page_nav_list": None})
+        return context
+
+
+class TopView(_PageRangeMixin, generic.FormView):
     template_name = apps.AppConfig.name + '/top.html'
-    success_url = reverse_lazy('main:top')
+    object_list = None
+
+    def get_queryset(self):
+        return Action.objects.filter(action=models.ACTION_IN).\
+            order_by('user__division', 'user__first_name', 'user__last_name')
 
     def get_form(self, form_class=None):
-        q = Action.objects.filter(action=models.ACTION_IN)
+        s = self.object_list
+        q = s if s is not None else self.get_queryset()
 
         class _Form(forms.Form):
             def __init__(self, *a, **k):
@@ -40,13 +72,17 @@ class TopView(generic.FormView):
                 user.action.save()
         return r
 
+    def get_success_url(self):
+        p = self.kwargs.get('page') or self.request.GET.get('page') or None
+        kwargs = None
+        if p is not None:
+            kwargs = {'page': p}
+        return reverse('main:top', kwargs=kwargs)
+
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        qlist = Action.objects.filter(action=models.ACTION_IN).\
-            order_by('user__division', 'user__first_name', 'user__last_name')
-        # print(qlist.query)
-        context.update({'qlist': qlist})
-        return context
+        self.object_list = self.get_queryset()
+        # print(self.object_list.query)
+        return super().get_context_data(**kwargs)
 
 
 def ToggleView(request, *args, **kwargs):
@@ -60,21 +96,8 @@ def ToggleView(request, *args, **kwargs):
     return redirect('main:top')
 
 
-class LogView(generic.ListView):
+class LogView(_PageRangeMixin, generic.ListView):
     template_name = apps.AppConfig.name + '/log.html'
-    paginate_by = 50
-
-    class _Paginator(Paginator):
-        def validate_number(self, number):
-            try:
-                n = super().validate_number(number)
-            except PageNotAnInteger:
-                n = 1
-            except EmptyPage:
-                n = self.num_pages
-            return n
-
-    paginator_class = _Paginator
 
     def get_queryset(self):
         q = models.Log.objects.none()
@@ -82,14 +105,3 @@ class LogView(generic.ListView):
             q = models.Log.objects.filter(user=self.request.user).\
                 order_by('create_at').reverse()
         return q
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if context["is_paginated"]:
-            p = context["page_obj"]
-            r = p.paginator.get_elided_page_range(
-                number=p.number, on_each_side=1, on_ends=1)
-            context.update({"page_nav_list": r})
-        else:
-            context.update({"page_nav_list": None})
-        return context
